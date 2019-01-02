@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Vertices of pentagon
+     * 五角的顶点
      */
     Point[] pentagonVertices;
 
@@ -24,17 +25,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Buttons to be animated
+     * 动画的按钮
      */
     Button[] buttons;
 
+    int lineHeight;
     int height, width;
 
+    //半径
     int radius;
 
+    //持续时间
     int ANIMATION_DURATION = 300;
 
     /**
      * Coordination of button
+     * 协调按钮
      */
     int startPositionX = 0;
     int startPositionY = 0;
@@ -43,15 +49,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * To check which animation is to be played
      * O for enter animation
      * 1 for exit animation
+     *检查要播放的动画
+     *  O用于输入动画
+     *  1表示退出动画
      */
     int whichAnimation = 0;
 
     //Polygon
+    //多边形
     int NUM_OF_SIDES = 5;
-    int POSITION_CORRECTION = 11;
+    int POSITION_CORRECTION = 18;
 
-    int[] enterDelay = {80, 120, 160, 40, 0};
-    int[] exitDelay = {80, 40, 0, 120, 160};
+    //输入延迟
+    //退出延迟
+    int[] enterDelay = {0, 80, 160, 240, 300};
+    int[] exitDelay = {300, 240, 160, 80, 0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,23 +86,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * Calculating the center of pentagon
+         * 计算五角的中心
          */
-        Display display = getWindowManager().getDefaultDisplay();
-        int centerX = display.getWidth() / 2;
-        int centerY = display.getHeight() / 2;
+//        Display display = getWindowManager().getDefaultDisplay();
+//        int centerX = display.getWidth() / 10;
+//        int centerY = display.getHeight() / 10;
 
         /**
          * Calculating the coordinates of vertices of pentagon
+         * 计算五边形顶点的坐标
          */
         for (int i = 0; i < NUM_OF_SIDES; i++) {
-            pentagonVertices[i] = new Point((int) (radius * Math.cos(rotation + i * 2 * Math.PI / NUM_OF_SIDES)) + centerX,
-                    (int) (radius * Math.sin(rotation + i * 2 * Math.PI / NUM_OF_SIDES)) + centerY - 100);
+//            pentagonVertices[i] = new Point((int) (radius * Math.cos(rotation + i * 2 * Math.PI / NUM_OF_SIDES)) + centerX,
+//                    (int) (radius * Math.sin(rotation + i * 2 * Math.PI / NUM_OF_SIDES)) + centerY - 100);
+            pentagonVertices[i] = new Point((int) ((rotation + lineHeight+70  )),
+                    (int) (rotation + lineHeight) + (i*(180)));
         }
 
         buttons = new Button[pentagonVertices.length];
 
         for (int i = 0; i < buttons.length; i++) {
             //Adding button at (0,0) coordinates and setting their visibility to zero
+            //在（0,0）坐标添加按钮，并设置其能见度为零
             buttons[i] = new Button(MainActivity.this);
             buttons[i].setLayoutParams(new RelativeLayout.LayoutParams(5, 5));
             buttons[i].setX(0);
@@ -104,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttons[i].setTextSize(20);
             /**
              * Adding those buttons in acitvities layout
+             * 在活动布局中添加这些按钮
              */
             ((RelativeLayout) findViewById(R.id.activity_main)).addView(buttons[i]);
         }
@@ -121,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     /**
                      * Getting the center point of floating action button
                      *  to set start point of buttons
+                     *  获取浮动动作按钮的中心点
+                     *  设置按钮的起点
                      */
                     startPositionX = (int) view.getX() + 50;
                     startPositionY = (int) view.getY() + 50;
@@ -133,11 +153,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     for (int i = 0; i < buttons.length; i++) {
                         playEnterAnimation(buttons[i], i);
                     }
+
+                    //  1表示退出动画
                     whichAnimation = 1;
                 } else {
                     for (int i = 0; i < buttons.length; i++) {
                         playExitAnimation(buttons[i], i);
                     }
+                    // O用于输入动画
                     whichAnimation = 0;
                 }
         }
@@ -167,11 +190,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * Animator that animates buttons x and y position simultaneously with size
+         * 动画可以同时按下按钮x和y的位置
          */
         AnimatorSet buttonAnimator = new AnimatorSet();
 
         /**
          * ValueAnimator to update x position of a button
+         * 值动画更新按钮的x位置
          */
         ValueAnimator buttonAnimatorX = ValueAnimator.ofFloat(startPositionX + button.getLayoutParams().width / 2,
                 pentagonVertices[position].x);
@@ -186,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * ValueAnimator to update y position of a button
+         * 值动画更新按钮的y位置
          */
         ValueAnimator buttonAnimatorY = ValueAnimator.ofFloat(startPositionY + 5,
                 pentagonVertices[position].y);
@@ -200,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * This will increase the size of button
+         * 这会增加按钮的大小
          */
         ValueAnimator buttonSizeAnimator = ValueAnimator.ofInt(5, width);
         buttonSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -215,6 +242,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /**
          * Add both x and y position update animation in
          *  animator set
+         *  添加x和y位置更新动画
+         * 动画师集
          */
         buttonAnimator.play(buttonAnimatorX).with(buttonAnimatorY).with(buttonSizeAnimator);
         buttonAnimator.setStartDelay(enterDelay[position]);
@@ -225,11 +254,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * Animator that animates buttons x and y position simultaneously with size
+         * 动画可以同时按下按钮x和y的位置
          */
         AnimatorSet buttonAnimator = new AnimatorSet();
 
         /**
          * ValueAnimator to update x position of a button
+         * ValueAnimator用于更新按钮的x位置
          */
         ValueAnimator buttonAnimatorX = ValueAnimator.ofFloat(pentagonVertices[position].x - button.getLayoutParams().width / 2,
                 startPositionX);
@@ -244,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * ValueAnimator to update y position of a button
+         * ValueAnimator用于更新按钮的y位置
          */
         ValueAnimator buttonAnimatorY = ValueAnimator.ofFloat(pentagonVertices[position].y,
                 startPositionY + 5);
@@ -258,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * This will decrease the size of button
+         * 这将减小按钮的大小
          */
         ValueAnimator buttonSizeAnimator = ValueAnimator.ofInt(width, 5);
         buttonSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -273,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /**
          * Add both x and y position update animation in
          *  animator set
+         *  添加x和y位置更新动画
+         * 动画设定
          */
         buttonAnimator.play(buttonAnimatorX).with(buttonAnimatorY).with(buttonSizeAnimator);
         buttonAnimator.setStartDelay(exitDelay[position]);
